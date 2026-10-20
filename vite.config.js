@@ -1,0 +1,1 @@
+import{defineConfig}from'vite';export default defineConfig({server:{allowedHosts:['terminal.local']},build:{rollupOptions:{onwarn(w,warn){if(w.code==='MODULE_LEVEL_DIRECTIVE'&&w.message.includes('use client'))return;warn(w)}}}});
