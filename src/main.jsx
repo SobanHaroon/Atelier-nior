@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect, useLayoutEffect, useCallback, Suspense, lazy } from 'react';
+import React, { useState, useRef, useEffect, useLayoutEffect, useCallback } from 'react';
 import { createRoot } from 'react-dom/client';
 import { motion, AnimatePresence, MotionConfig, useReducedMotion } from 'framer-motion';
 import { gsap } from 'gsap';
@@ -12,7 +12,6 @@ import '@fontsource/hanken-grotesk/latin-500.css';
 import '@fontsource/hanken-grotesk/latin-600.css';
 import './style.css';
 
-const GarmentScene = lazy(() => import('./GarmentScene'));
 gsap.registerPlugin(ScrollTrigger);
 
 function Icon({ name, ...props }) {
@@ -78,15 +77,13 @@ function getSaved(key, validate) {
 
 function App() {
   const root = useRef();
-  const motionState = useRef({ rotation: .2, scale: 1.08, x: 0, y: 0, tilt: -.02 });
   const reduced = useReducedMotion();
-  const [edition, setEdition] = useState(editions[0]), [ready, setReady] = useState(false), [chapter, setChapter] = useState(0);
+  const [edition, setEdition] = useState(editions[0]), [chapter, setChapter] = useState(0);
   const [filter, setFilter] = useState('All pieces'), [sort, setSort] = useState('Featured');
   const [panel, setPanel] = useState(null), [menu, setMenu] = useState(false), [search, setSearch] = useState(''), [toast, setToast] = useState(''), [orderReady, setOrderReady] = useState(false);
   const [cart, setCart] = useState(() => getSaved('noir-bag', x => x && products.some(p => p.id === x.id && p.sizes.includes(x.size)) && Number.isInteger(x.qty) && x.qty > 0 && x.qty <= 10));
   const [wishlist, setWishlist] = useState(() => getSaved('noir-wishlist', id => products.some(p => p.id === id)));
   const closePanel = useCallback(() => { setPanel(null); setOrderReady(false); }, []);
-  const onReady = useCallback(() => setReady(true), []);
   const open = (type, data) => { setMenu(false); setPanel({ type, data }); setOrderReady(false); };
 
   useEffect(() => { try { localStorage.setItem('noir-bag', JSON.stringify(cart)); localStorage.setItem('noir-wishlist', JSON.stringify(wishlist)); } catch {} }, [cart, wishlist]);
@@ -94,27 +91,27 @@ function App() {
   useLayoutEffect(() => {
     if (reduced) return;
     const ctx = gsap.context(() => {
+      // One art-directed garment presentation on every device. WebGL capability
+      // must not swap this artwork for the unfinished procedural prototype.
+      gsap.set('.poster-motion', { transformPerspective: 1200 });
       gsap.from('.hero-title span', { yPercent: 110, stagger: .12, duration: 1.2, ease: 'power4.out', delay: .2 });
       gsap.from('.hero-intro,.edition-selector,.hero-bottom', { opacity: 0, y: 15, duration: 1, delay: .65 });
       const tl = gsap.timeline({ scrollTrigger: { trigger: '.experience', start: 'top top', end: 'bottom bottom', scrub: 1.2, onUpdate: self => setChapter(Math.min(3, Math.floor(self.progress * 4))) } });
-      tl.to('.opening-copy', { autoAlpha: 0, y: -50, duration: .15 }, 0)
+      tl.to('.opening-copy,.edition-selector', { autoAlpha: 0, y: -50, duration: .15 }, 0)
         .to('.hero-title', { opacity: .12, scale: 1.2, duration: .2 }, 0)
-        .to(motionState.current, { rotation: -.65, scale: 1.75, x: .65, y: -.18, tilt: .06, duration: .26, ease: 'none' }, 0)
         .fromTo('.story-a', { autoAlpha: 0, y: 35 }, { autoAlpha: 1, y: 0, duration: .07 }, .15)
         .to('.story-a', { autoAlpha: 0, y: -35, duration: .06 }, .36)
         .to('.light-world', { opacity: 1, duration: .14 }, .35)
         .to('.stage', { color: '#181818', duration: .14 }, .35)
-        .to(motionState.current, { rotation: Math.PI + .3, scale: 1.55, x: -.65, y: -.1, tilt: -.06, duration: .28, ease: 'none' }, .28)
         .fromTo('.story-b', { autoAlpha: 0, y: 35 }, { autoAlpha: 1, y: 0, duration: .07 }, .43)
         .to('.story-b', { autoAlpha: 0, y: -35, duration: .06 }, .65)
         .to('.crimson-world', { opacity: 1, duration: .15 }, .65)
         .to('.stage', { color: '#f1f0e9', duration: .15 }, .65)
-        .to(motionState.current, { rotation: Math.PI * 2 + .2, scale: 1.08, x: 0, y: 0, tilt: 0, duration: .32, ease: 'none' }, .6)
         .fromTo('.finale-title', { opacity: 0, scale: 1.25 }, { opacity: .7, scale: 1, duration: .15 }, .73)
         .fromTo('.story-c', { autoAlpha: 0, y: 25 }, { autoAlpha: 1, y: 0, duration: .09 }, .83)
-        .to('.poster-motion', { xPercent: 15, scale: 1.8, rotate: 7, duration: .26 }, 0)
-        .to('.poster-motion', { xPercent: -15, scale: 1.65, rotate: -5, duration: .3 }, .29)
-        .to('.poster-motion', { xPercent: 0, scale: 1, rotate: 0, duration: .3 }, .62)
+        .to('.poster-motion', { xPercent: 15, scale: 1.8, rotate: 7, rotationY: -9, rotationX: 2, duration: .26 }, 0)
+        .to('.poster-motion', { xPercent: -15, scale: 1.65, rotate: -5, rotationY: 9, rotationX: -2, duration: .3 }, .29)
+        .to('.poster-motion', { xPercent: 0, scale: 1, rotate: 0, rotationY: 0, rotationX: 0, duration: .3 }, .62)
         .to('.chapter-line', { scaleY: 1, duration: 1, ease: 'none' }, 0);
       gsap.utils.toArray('.reveal').forEach(el => gsap.from(el, { opacity: 0, y: 40, duration: 1, ease: 'power3.out', scrollTrigger: { trigger: el, start: 'top 90%', once: true } }));
       gsap.to('.campaign-photo img', { yPercent: 10, ease: 'none', scrollTrigger: { trigger: '.campaign', start: 'top bottom', end: 'bottom top', scrub: 1 } });
@@ -147,7 +144,7 @@ function App() {
     'Privacy': 'Your bag and saved pieces are stored in this browser’s local storage so they remain available when you return. Search queries and order summaries are processed on your device. This preview does not collect payment information, send orders, or install analytics. Hosting providers may process standard access logs.',
     'Delivery & returns': 'This is a collection concept, with no live fulfilment or returns service. Prices and products are illustrative. Delivery regions, costs, returns terms and payment services need to be configured before commercial launch.',
     'Contact the atelier': 'The atelier contact channel has not yet been configured. You can explore the collection, save your favourite pieces, and download a selected order summary from your bag.',
-    'Concept information': 'An independent Atelier Noir design concept, developed from the supplied Stitch artwork and cinematic video reference. Original garment imagery and a reconstructed interactive 3D scene evoke the reference. Products, prices, material descriptions and atelier narrative are illustrative.',
+    'Concept information': 'An independent Atelier Noir design concept, developed from the supplied Stitch artwork and cinematic video reference. Detailed garment artwork, perspective motion and scroll choreography evoke the reference. Products, prices, material descriptions and atelier narrative are illustrative.',
   };
 
   return <MotionConfig reducedMotion="user"><div ref={root} className={'app theme-' + edition.id}>
@@ -166,7 +163,7 @@ function App() {
         <div className="dark-world"><div className="light-column"/><div className="world-grid"/><div className="studio-ring"/></div><div className="light-world"/><div className="crimson-world"><div/><div/><div/></div>
         <div className="hero-intro opening-copy"><p className="eyebrow"><span className="red-dot"/> Edition N° 07 / Objects in motion</p><p className="tiny">PARIS — KYOTO<br/>A STUDY IN CONTRAST</p></div>
         <div className="hero-title" aria-hidden="true"><div><span>FORM</span></div><div><span>IN MOTION</span></div></div><div className="finale-title" aria-hidden="true">NOIR<br/>NOIR<br/>NOIR</div>
-        <div className="garment-stage"><div className={'poster-motion ' + (ready ? 'has-webgl' : '')}><img src="/images/jacket.webp" alt="Floating black technical jacket with crimson piping" fetchPriority="high" className={'garment-poster ' + edition.id}/></div><Suspense fallback={null}><GarmentScene motionState={motionState} edition={edition} onReady={onReady} reduced={reduced}/></Suspense><div className="garment-shadow"/></div>
+        <div className="garment-stage"><div className="poster-motion"><img src="/images/jacket.webp" alt={'Floating ' + edition.name.toLowerCase() + ' technical jacket with crimson piping'} fetchPriority="high" draggable={false} className={'garment-poster ' + edition.id}/></div><div className="garment-shadow"/></div>
         <div className="opening-copy hero-side"><span className="eyebrow">Form follows feeling.</span><h1>Engineered<br/>to stand <i>apart.</i></h1><p>Architectural lines.<br/>Uncompromising movement.</p><a href="#collection" className="inline-link">Explore the collection <Icon name="arrow"/></a></div>
         <div className="edition-selector"><span className="tiny">SELECT AN EXPRESSION</span><div>{editions.map(e => <button key={e.id} aria-label={'Select ' + e.name + ' edition'} aria-pressed={edition.id === e.id} className={edition.id === e.id ? 'active' : ''} onClick={() => setEdition(e)}><span style={{ background: e.color }}/><small>{e.name}</small></button>)}</div></div>
         <div className="story story-a"><span className="eyebrow">01 / The construction</span><h2>Nothing<br/>left to<br/><i>chance.</i></h2><p>Articulated seams.<br/>A precise silhouette.<br/>Every detail with purpose.</p></div>

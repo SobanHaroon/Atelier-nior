@@ -10,18 +10,18 @@ A cinematic menswear storefront exploring the relationship between architectural
 
 Atelier Noir is a frontend portfolio concept built with React and Vite. The opening experience moves through four visual chapters, shifting from a dark studio to ivory and crimson environments as the visitor scrolls. Oversized typography, restrained product layouts, and coordinated transitions carry the visual direction into the collection, campaign, and atelier sections.
 
-The project adapts a supplied menswear design and cinematic video reference. The garment geometry is recreated procedurally in Three.js; the original reference model is not included. Browsers without WebGL2 display an animated WebP jacket image. The preview above shows that image presentation.
+The project adapts a supplied menswear design and cinematic video reference. Production uses the same detailed WebP jacket artwork on every device, with scroll-driven zooms and bounded perspective motion. It does not automatically replace that artwork based on WebGL support. The original reference model is not included; the earlier procedural Three.js reconstruction is retained in the source as an inactive prototype.
 
 ## Features
 
 - **Cinematic scroll journey:** GSAP ScrollTrigger coordinates garment rotation, scale, position, chapter copy, background transitions, and campaign parallax.
-- **Interactive 3D garment:** Procedural jacket geometry, textured fabric, studio lighting, pointer-drag rotation, and Carbon, Chalk, and Crimson material expressions.
+- **Consistent garment presentation:** Detailed jacket artwork, subtle perspective tilts, cinematic close-ups, and Carbon, Chalk, and Crimson visual expressions across desktop and mobile.
 - **Responsive collection:** Six concept products with category filters, price sorting, and text search.
 - **Product discovery:** Product details, composition and care information, size selection, and saved pieces.
 - **Shopping bag:** Size-specific items, quantity controls, calculated totals, and persistence through browser local storage.
 - **Demo order review:** Downloadable text summary without submitting an order or collecting payment.
 - **Accessible interactions:** Semantic controls, keyboard focus management, Escape-to-close dialogs, a skip link, and reduced-motion support.
-- **Performance considerations:** Lazy-loaded Three.js scene, capped pixel density, rendering suspended outside the viewport or in hidden tabs, local fonts, and WebP imagery.
+- **Performance considerations:** Transform-based garment animation, local fonts, WebP imagery, and no continuous WebGL render loop or Three.js bundle in the production page.
 
 ## Technology
 
@@ -30,7 +30,7 @@ The project adapts a supplied menswear design and cinematic video reference. The
 | React 19 | Components, catalog state, dialogs, wishlist, and bag |
 | Vite 7 | Development server and production bundling |
 | GSAP 3 + ScrollTrigger | Scroll choreography and section reveals |
-| Three.js | Procedural garment, materials, lighting, and rendering |
+| Three.js | Inactive procedural prototype retained for future 3D asset work |
 | Anime.js 4 | Brand mark drawing animation |
 | Framer Motion 12 | Product, overlay, drawer, and interface transitions |
 | CSS | Responsive layouts, typography, and visual states |
@@ -45,7 +45,7 @@ Exact dependency versions are recorded in `package-lock.json`.
 
 - Node.js **22.12+**, or Node.js **24**
 - npm
-- A modern browser; WebGL2 enables the interactive 3D presentation
+- A modern browser; WebGL is not required for the production presentation
 
 ### Install and run
 
@@ -79,7 +79,7 @@ npm run preview
 | Path | Responsibility |
 | --- | --- |
 | `src/main.jsx` | Application components, shopping interactions, and scroll timeline |
-| `src/GarmentScene.jsx` | Three.js geometry, materials, lighting, and rendering lifecycle |
+| `src/GarmentScene.jsx` | Inactive Three.js prototype; not imported by the production app |
 | `src/products.js` | Product catalog, scene expressions, and currency formatting |
 | `src/style.css` | Visual system, responsive layouts, and image crops |
 | `public/images/` | Jacket artwork and editorial collection imagery |
@@ -93,17 +93,17 @@ Generated builds, dependencies, local environment files, and hosting metadata ar
 
 ## Motion architecture
 
-GSAP owns the scroll timeline and writes the current garment pose into a shared React ref. The Three.js animation loop reads that pose directly, avoiding a React render for every animation frame. Framer Motion handles interface transitions, while Anime.js animates the brand mark.
+GSAP owns the scroll timeline and directly animates the jacket artwork’s position, scale, rotation, and bounded CSS perspective. This produces layered depth without replacing the detailed garment with approximate geometry. Framer Motion handles interface transitions, while Anime.js animates the brand mark.
 
-The 3D scene is loaded separately from the main application. Its rendering loop pauses when the scene leaves the viewport or the document becomes hidden. Geometry, materials, textures, observers, and event listeners are cleaned up when the scene unmounts.
+The production page uses a single rendering path regardless of GPU or WebGL capability. The procedural Three.js component is intentionally not imported, so it cannot replace the jacket after loading and is excluded from the production bundle. Full 360-degree garment rotation is not part of this presentation.
 
-When reduced motion is preferred, the extended scroll choreography and 3D rendering are disabled in favor of a simpler presentation. When WebGL2 is unavailable, the jacket artwork follows the scroll composition as an image fallback. Image and 3D presentations intentionally use different rendering techniques and are not visually identical.
+When reduced motion is preferred, the extended scroll choreography and perspective transforms are disabled in favor of a static garment composition.
 
 ## Customization
 
 - **Catalog and pricing:** Edit `src/products.js`. Keep product IDs stable to preserve saved browser state.
 - **Scroll choreography:** Adjust the GSAP timeline and chapter content in `src/main.jsx`.
-- **Garment appearance:** Edit procedural geometry, lighting, and materials in `src/GarmentScene.jsx`.
+- **Garment appearance:** Replace `public/images/jacket.webp`; adjust expression filters in `src/style.css`. The procedural `src/GarmentScene.jsx` file is an inactive experiment, not the production renderer.
 - **Typography and layout:** Update `src/style.css` and the Fontsource imports in `src/main.jsx`.
 - **Imagery:** Replace the files in `public/images/` and update image names and crop classes where needed.
 - **Brand copy and metadata:** Edit the page content in `src/main.jsx` and metadata in `index.html`.
@@ -131,7 +131,7 @@ For Netlify, use the same install and build commands, with `dist` as the publish
 
 ## Validation and current scope
 
-The production build completed successfully, and desktop and mobile layouts, navigation, search, product selection, wishlist, and bag interactions were manually checked. The deployed asset bundle was verified against the final local build. The browser used for validation displayed the image fallback; WebGL rendering should also be checked on target devices before a commercial release. No automated test suite is currently included.
+The production build completed successfully, and desktop and mobile layouts, navigation, search, product selection, wishlist, and bag interactions were manually checked. A subsequent jacket rendering fix removed the automatic WebGL model swap so the detailed artwork remains consistent across devices. No automated test suite is currently included.
 
 This repository is a **storefront concept**, not a connected commerce backend. Product specifications, prices, availability, and brand narrative are illustrative. Wishlist and bag state are stored only in the visitor's browser under `noir-wishlist` and `noir-bag`.
 

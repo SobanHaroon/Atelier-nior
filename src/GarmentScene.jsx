@@ -1,6 +1,9 @@
 import React, { useEffect, useRef } from 'react';
 import * as THREE from 'three';
 
+// Experimental prototype retained for future model work. Not imported by the
+// production app: its geometry does not match the approved jacket artwork.
+// A production 3D replacement needs a reviewed garment asset and device QA.
 // A procedural garment: no external model request is needed for the scene.
 // ScrollTrigger writes camera poses into motionState without React frame updates.
 export default function GarmentScene({ motionState, edition, onReady, reduced }) {
