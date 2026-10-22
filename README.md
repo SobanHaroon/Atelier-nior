@@ -132,7 +132,7 @@ Deploy the **whole repository** to Vercel; uploading `dist/` alone will omit the
 | Output | `dist` |
 | Node.js | 24.x |
 
-The existing production project is `atelier-noir-motion`. Its public URL is [atelier-noir-motion.vercel.app](https://atelier-noir-motion.vercel.app/). The deployment is made from source. A GitHub push does not by itself establish Vercel's Git integration; connect this repository in the project's settings if automatic deployments are desired.
+The existing production project is `atelier-noir-motion`. Its public URL is [atelier-noir-motion.vercel.app](https://atelier-noir-motion.vercel.app/). Vercel's Git integration deploys this repository's `main` branch to production automatically. The commerce release was verified against its Git commit and the production deployment reported `READY`.
 
 Configure server environment variables separately for preview and production. Redeploy after configuration changes. Keep test payment credentials and test inventory separate from live data.
 

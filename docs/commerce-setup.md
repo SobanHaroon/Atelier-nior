@@ -91,7 +91,7 @@ Use the repository root with the Vite preset, Node 24.x, `npm ci`, `npm run buil
 
 The checked-in `vercel.json` preserves API routes, enables deep application links, and adds restrictive response headers. The site uses local fonts and images. Stripe is opened as a top-level redirect, not embedded in a frame.
 
-The existing project is `atelier-noir-motion`, with production at `https://atelier-noir-motion.vercel.app`. Set `STORE_URL` to the final public origin. Update the sitemap when changing domains. Connect the GitHub repository to the existing Vercel project if automatic deploys are desired; the current source deployment does not automatically establish that connection.
+The existing project is `atelier-noir-motion`, with production at `https://atelier-noir-motion.vercel.app`. Set `STORE_URL` to the final public origin. Update the sitemap when changing domains. The existing Vercel project is connected to this GitHub repository and deploys `main` automatically. Check the deployment commit and ready state after every production push.
 
 ## 7. Verify before enabling real orders
 
