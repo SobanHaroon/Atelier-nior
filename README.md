@@ -1,142 +1,160 @@
 # Atelier Noir — Form in Motion
 
-A cinematic menswear storefront exploring the relationship between architectural tailoring, movement, and digital interaction. An editorial shopping experience combines a scroll-driven garment study with a responsive product catalog.
+A cinematic menswear storefront with a complete browsing, bag, and checkout experience. Architectural typography, scroll-driven garment studies, and restrained motion extend into a searchable collection, dedicated product pages, and client services.
 
-**[Explore the live website](https://atelier-noir-motion.vercel.app/)** · **[Source code](https://github.com/SobanHaroon/Atelier-nior)**
+**[Live storefront](https://atelier-noir-motion.vercel.app/)** · **[Collection](https://atelier-noir-motion.vercel.app/catalog)** · **[Commerce setup guide](docs/commerce-setup.md)**
 
-![Atelier Noir homepage featuring the technical jacket and editorial typography](docs/preview.jpg)
+![Atelier Noir cinematic homepage](docs/preview.jpg)
 
-## Overview
+## Project status
 
-Atelier Noir is a frontend portfolio concept built with React and Vite. The opening experience moves through four visual chapters, shifting from a dark studio to ivory and crimson environments as the visitor scrolls. Oversized typography, restrained product layouts, and coordinated transitions carry the visual direction into the collection, campaign, and atelier sections.
+The storefront and commerce integration are implemented. **Real ordering remains closed until the merchant connects and verifies the services, approves the catalog, enters actual stock, and publishes business and fulfilment details.** With no credentials, the collection, product pages, wishlist, and shopping bag work normally; checkout and contact clearly show their availability instead of simulating a payment or delivered message.
 
-The project adapts a supplied menswear design and cinematic video reference. Production uses the same detailed WebP jacket artwork on every device, with scroll-driven zooms and bounded perspective motion. It does not automatically replace that artwork based on WebGL support. The original reference model is not included; the earlier procedural Three.js reconstruction is retained in the source as an inactive prototype.
+The six products, prices, specifications, and editorial imagery originate from the design concept and require merchant approval before sale. This repository does not create a payment account, provide merchandise, or fulfil orders.
 
 ## Features
 
-- **Cinematic scroll journey:** GSAP ScrollTrigger coordinates garment rotation, scale, position, chapter copy, background transitions, and campaign parallax.
-- **Consistent garment presentation:** Detailed jacket artwork, subtle perspective tilts, cinematic close-ups, and Carbon, Chalk, and Crimson visual expressions across desktop and mobile.
-- **Responsive collection:** Six concept products with category filters, price sorting, and text search.
-- **Product discovery:** Product details, composition and care information, size selection, and saved pieces.
-- **Shopping bag:** Size-specific items, quantity controls, calculated totals, and persistence through browser local storage.
-- **Demo order review:** Downloadable text summary without submitting an order or collecting payment.
-- **Accessible interactions:** Semantic controls, keyboard focus management, Escape-to-close dialogs, a skip link, and reduced-motion support.
-- **Performance considerations:** Transform-based garment animation, local fonts, WebP imagery, and no continuous WebGL render loop or Three.js bundle in the production page.
+- **Cinematic homepage:** Four scroll chapters, GSAP choreography, perspective motion, editorial campaign sections, and reduced-motion support.
+- **Full catalog page:** Text search, category and size filters, price ranges, sorting, result counts, shareable filter URLs, and useful empty states.
+- **Product pages:** Image zoom, descriptions, material and care information, size selection, related pieces, and saved favorites.
+- **Persistent shopping bag:** Size-specific line items, quantity controls, removal, authoritative server-side pricing at checkout, and browser persistence.
+- **Search everywhere:** Desktop header search, mobile search drawer, and live catalog results.
+- **Hosted checkout:** Server-created Stripe Checkout sessions, delivery-country selection, explicit shipping fees, Stripe Tax, protected order receipts, and printable confirmations.
+- **Order integrity:** Atomic inventory reservation, idempotent requests, signed webhooks, verified payment totals, and an authenticated reconciliation endpoint.
+- **Client services:** Contact form, size guide, delivery and returns information, privacy notice, and configurable terms of sale.
+- **Contact delivery:** Validation, honeypot, durable rate limits, database persistence, and Resend delivery to a fixed merchant inbox.
+- **Responsive interface:** Dedicated mobile layouts, keyboard-accessible overlays, focus management, Escape dismissal, and semantic controls.
 
 ## Technology
 
-| Technology | Role |
+| Layer | Technology |
 | --- | --- |
-| React 19 | Components, catalog state, dialogs, wishlist, and bag |
-| Vite 7 | Development server and production bundling |
-| GSAP 3 + ScrollTrigger | Scroll choreography and section reveals |
-| Three.js | Inactive procedural prototype retained for future 3D asset work |
-| Anime.js 4 | Brand mark drawing animation |
-| Framer Motion 12 | Product, overlay, drawer, and interface transitions |
-| CSS | Responsive layouts, typography, and visual states |
-| Fontsource | Locally bundled Bodoni Moda and Hanken Grotesk |
-| Vercel | Production hosting |
+| Application | React 19, React Router 7, Vite 7 |
+| Motion | GSAP + ScrollTrigger, Framer Motion, Anime.js |
+| Presentation | CSS, local Fontsource fonts, WebP imagery |
+| API | Node.js Vercel Functions, native fetch |
+| Database | Supabase Postgres, transactional SQL functions, restricted permissions |
+| Payments | Stripe-hosted Checkout and signed webhooks |
+| Contact | Resend |
+| Tests | Node test runner and PGlite for the actual SQL migration |
+| Hosting | Vercel |
 
-Exact dependency versions are recorded in `package-lock.json`.
+Exact versions are recorded in `package-lock.json`. `src/GarmentScene.jsx` retains the earlier Three.js prototype, but it is not imported into production. The deployed garment uses detailed artwork with layered perspective animation, preserving the jacket consistently across devices. It is not a full 360-degree 3D asset.
 
-## Getting started
+## Local development
 
-### Requirements
-
-- Node.js **22.12+**, or Node.js **24**
-- npm
-- A modern browser; WebGL is not required for the production presentation
-
-### Install and run
+Requirements: Node.js **22.12+** or **24**, npm, and a modern browser.
 
 ```bash
 git clone https://github.com/SobanHaroon/Atelier-nior.git
 cd Atelier-nior
 npm ci
+cp .env.example .env.local
 npm run dev
 ```
 
-Open the local URL printed by Vite. No environment variables or API keys are required for the current frontend.
-
-### Commands
+Open the URL printed by Vite. Set `STORE_URL` to that exact origin when testing POST endpoints. The default `.env.example` keeps commerce closed; browsing needs no external service credentials. The Vite development plugin serves the same API handlers used on Vercel.
 
 | Command | Purpose |
 | --- | --- |
-| `npm ci` | Install the dependencies recorded in the lockfile |
-| `npm run dev` | Start the development server |
-| `npm run build` | Generate the production site in `dist/` |
-| `npm run preview` | Serve the existing production build locally |
+| `npm ci` | Install the locked dependencies |
+| `npm run dev` | Run the frontend and local API handlers |
+| `npm test` | Run pricing, API, authorization, and database regression tests |
+| `npm run build` | Create the production frontend in `dist/` |
+| `npm run check` | Run tests and build |
+| `npm run preview` | Inspect the static production frontend; does not serve API handlers |
 
-To inspect the production build:
+Keep `.env.local` private. All payment, database, and email credentials are server-only: **never prefix them with `VITE_`**. The empty `.env.example` is the only environment file committed to this repository.
 
-```bash
-npm run build
-npm run preview
-```
+## Routes
 
-## Project structure
+| Route | Experience |
+| --- | --- |
+| `/` | Cinematic homepage |
+| `/catalog` | Searchable, filterable collection |
+| `/products/:id` | Product details and size selection |
+| `/wishlist` | Saved pieces |
+| `/cart` | Shopping bag |
+| `/checkout` | Contact, destination, policy acceptance, and order review |
+| `/checkout/success` | Server-verified payment status and receipt |
+| `/contact` | Client services and contact form |
+| `/size-guide` | General sizing guidance |
+| `/delivery-returns` | Merchant delivery and returns policies |
+| `/privacy` | Data handling information |
+| `/terms` | Merchant terms and business identity |
+
+Unknown paths show a recovery page. Vercel rewrites support direct navigation to application routes while preserving API and static-file requests.
+
+## Commerce architecture
+
+1. The browser submits product IDs, sizes, quantities, email, destination, and a checkout attempt ID. Client-supplied prices are ignored.
+2. The API validates input, applies a durable rate limit, reads the shared server catalog, and reserves inventory in one database transaction.
+3. The server creates a Stripe-hosted session using a stable idempotency key. Card and full address entry take place on Stripe.
+4. Signed webhooks retrieve the current Stripe session and verify the order reference, subtotal, shipping, tax, currency, and final total before marking an order paid.
+5. The confirmation page requires a private receipt token stored in the customer's browser session. A return URL alone never confirms payment.
+6. Expired sessions release reserved stock once. Failed or uncertain provider requests are handled conservatively; an ambiguous response does not release inventory that may already have a payment session.
+
+The database migration starts all variants at **zero stock**. Orders and messages are not accessible through anonymous or ordinary signed-in Supabase clients. The server service credential is required for these operations.
+
+See [the setup guide](docs/commerce-setup.md) for schema installation, service configuration, webhook setup, payment testing, stock management, and operations.
+
+## Repository structure
 
 | Path | Responsibility |
 | --- | --- |
-| `src/main.jsx` | Application components, shopping interactions, and scroll timeline |
-| `src/GarmentScene.jsx` | Inactive Three.js prototype; not imported by the production app |
-| `src/products.js` | Product catalog, scene expressions, and currency formatting |
-| `src/style.css` | Visual system, responsive layouts, and image crops |
-| `public/images/` | Jacket artwork and editorial collection imagery |
-| `public/favicon.svg` | Site icon |
-| `docs/preview.jpg` | Website preview for this README |
-| `index.html` | Application entry and page metadata |
-| `vite.config.js` | Vite configuration |
-| `vercel.json` | Response headers for Vercel deployment |
-
-Generated builds, dependencies, local environment files, and hosting metadata are excluded through `.gitignore`.
-
-## Motion architecture
-
-GSAP owns the scroll timeline and directly animates the jacket artwork’s position, scale, rotation, and bounded CSS perspective. This produces layered depth without replacing the detailed garment with approximate geometry. Framer Motion handles interface transitions, while Anime.js animates the brand mark.
-
-The production page uses a single rendering path regardless of GPU or WebGL capability. The procedural Three.js component is intentionally not imported, so it cannot replace the jacket after loading and is excluded from the production bundle. Full 360-degree garment rotation is not part of this presentation.
-
-When reduced motion is preferred, the extended scroll choreography and perspective transforms are disabled in favor of a static garment composition.
-
-## Customization
-
-- **Catalog and pricing:** Edit `src/products.js`. Keep product IDs stable to preserve saved browser state.
-- **Scroll choreography:** Adjust the GSAP timeline and chapter content in `src/main.jsx`.
-- **Garment appearance:** Replace `public/images/jacket.webp`; adjust expression filters in `src/style.css`. The procedural `src/GarmentScene.jsx` file is an inactive experiment, not the production renderer.
-- **Typography and layout:** Update `src/style.css` and the Fontsource imports in `src/main.jsx`.
-- **Imagery:** Replace the files in `public/images/` and update image names and crop classes where needed.
-- **Brand copy and metadata:** Edit the page content in `src/main.jsx` and metadata in `index.html`.
-
-The scene expression selector changes the cinematic presentation. The Technical Shell in the catalog represents the Carbon edition.
+| `src/main.jsx` | Routes, metadata, error boundary, and lazy homepage loading |
+| `src/pages/` | Homepage, catalog, product, cart, checkout, contact, and information pages |
+| `src/components/` | Header, footer, search, bag drawer, overlays, and product cards |
+| `src/shop.jsx` | Shopping state, persistence, and public store configuration |
+| `src/style.css` | Original editorial visual system and cinematic presentation |
+| `src/commerce.css` | Commerce layouts, forms, and responsive behavior |
+| `shared/catalog.js` | Product records, stable SKUs, USD prices, and variant definitions |
+| `shared/cart.js` | Cart validation and server price calculation |
+| `api/` | Vercel entry points for store, checkout, order, webhook, contact, and reconciliation |
+| `server/` | Configuration, request guards, database, Stripe, and email adapters |
+| `supabase/migrations/` | Tables, inventory transactions, rate limits, and permissions |
+| `tests/` | Automated commerce, API, and database tests |
+| `public/` | Images, icon, robots rules, and sitemap |
+| `.env.example` | Empty server configuration template |
+| `vercel.json` | Routing, function limits, and security headers |
+| `docs/commerce-setup.md` | Launch and operations guide |
 
 ## Deployment
 
-The current production site is hosted at **https://atelier-noir-motion.vercel.app/**.
-
-To deploy this repository on Vercel, import `SobanHaroon/Atelier-nior`, use the repository root as the project root, and apply these settings:
+Deploy the **whole repository** to Vercel; uploading `dist/` alone will omit the server functions.
 
 | Setting | Value |
 | --- | --- |
-| Framework preset | Vite |
-| Install command | `npm ci` |
-| Build command | `npm run build` |
-| Output directory | `dist` |
-| Node.js | 22.12+ or 24 |
-| Environment variables | None required |
+| Framework | Vite |
+| Root directory | Repository root |
+| Install | `npm ci` |
+| Build | `npm run build` |
+| Output | `dist` |
+| Node.js | 24.x |
 
-The existing live site was deployed from source through Vercel. Pushing this repository alone does not configure a Git connection; connect it to the Vercel project to enable deployments from future commits.
+The existing production project is `atelier-noir-motion`. Its public URL is [atelier-noir-motion.vercel.app](https://atelier-noir-motion.vercel.app/). The deployment is made from source. A GitHub push does not by itself establish Vercel's Git integration; connect this repository in the project's settings if automatic deployments are desired.
 
-For Netlify, use the same install and build commands, with `dist` as the publish directory.
+Configure server environment variables separately for preview and production. Redeploy after configuration changes. Keep test payment credentials and test inventory separate from live data.
 
-## Validation and current scope
+## Customization
 
-The production build completed successfully, and desktop and mobile layouts, navigation, search, product selection, wishlist, and bag interactions were manually checked. A subsequent jacket rendering fix removed the automatic WebGL model swap so the detailed artwork remains consistent across devices. No automated test suite is currently included.
+- Update catalog records in `shared/catalog.js`; keep IDs stable and update the inventory migration or live variant records when adding sizes or products.
+- Replace product imagery in `public/images/` and adjust crop classes in the stylesheets.
+- Modify homepage animation and chapter copy in `src/pages/Home.jsx`.
+- Update the visual system in `src/style.css` and commerce layouts in `src/commerce.css`.
+- Configure merchant identity, policies, destinations, and shipping through the server environment.
+- Update the sitemap, metadata, and `STORE_URL` if the domain changes.
 
-This repository is a **storefront concept**, not a connected commerce backend. Product specifications, prices, availability, and brand narrative are illustrative. Wishlist and bag state are stored only in the visitor's browser under `noir-wishlist` and `noir-bag`.
+The homepage Carbon, Chalk, and Crimson selector changes the cinematic artwork treatment. The catalog's Technical Shell is the Carbon product; the other visual treatments do not imply purchasable variants.
 
-Before accepting real orders, connect an authoritative catalog, inventory, payment provider, server-side order processing, merchant contact information, and fulfillment rules. Checkout currently creates a downloadable summary only: it does not process payments or place orders.
+## Validation and operational scope
+
+The automated suite covers manipulated prices, invalid quantities, duplicate variants, launch gates, protected receipts, contact routing, webhook signatures, database access restrictions, reservation retries, stock rollback, overselling, and terminal order states. SQL tests execute the actual migration in PGlite; provider calls in API tests are mocked and do not charge cards or send email.
+
+Desktop and mobile browsing, filtering, search, product selection, bag persistence, checkout layout, contact layout, and the cinematic artwork have been checked. A real end-to-end payment and email delivery test remains required after merchant services are connected.
+
+The current adapter supports **USD card payments, one configured standard shipping rate, and configured destination countries**. There is no cash-on-delivery integration, multi-currency conversion, customer account area, or custom administration dashboard. Use the private Supabase dashboard for orders and stock, and Stripe for payment support and refunds. Fulfilment, shipment notifications, refund-related stock decisions, retention, and customer support remain merchant operations.
 
 ## Credits
 
-Created for **DevOps Services**. Art direction draws on the supplied menswear layout and cinematic reference video. Editorial imagery comes from the supplied design; the jacket artwork and procedural scene were created for this implementation. Third-party packages and fonts retain their respective licenses.
+Created for **DevOps Services**, based on the supplied menswear layout and cinematic reference. Editorial assets originate from that design. Confirm commercial rights and product accuracy before trading. Third-party libraries and fonts retain their own licenses.

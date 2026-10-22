@@ -1,0 +1,8 @@
+User-agent: *
+Allow: /
+Disallow: /api/
+Disallow: /cart
+Disallow: /checkout
+Disallow: /wishlist
+
+Sitemap: https://atelier-noir-motion.vercel.app/sitemap.xml

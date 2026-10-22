@@ -4,3 +4,6 @@ dist
 .netlify
 .env*
 qa.html
+
+!.env.example
+coverage
